@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# @name Gazebo Starling 2 / Corax (OASIS)
+#
+# @type Quadrotor
+#
+# ModalAI Starling 2 and its Corax variant, model rendered by the OASIS repository (scripts/px4/make_model.py)
+# and spawned by its launcher, which sets PX4_GZ_MODEL_NAME=starling_<id>. Rotor positions from the STEP
+# (configs/vehicles/starling2_c26_geometry.yaml), converted to FRD. Propulsion is estimated (no thrust data):
+# max 1890 rad/s, hover near 1090 rad/s at 285 g.
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+
+param set-default SIM_GZ_EN 1
+
+param set-default CA_AIRFRAME 0
+param set-default CA_ROTOR_COUNT 4
+
+# 0 front right ccw, 1 rear left ccw, 2 front left cw, 3 rear right cw
+param set-default CA_ROTOR0_PX 0.065
+param set-default CA_ROTOR0_PY 0.088
+param set-default CA_ROTOR0_KM 0.05
+
+param set-default CA_ROTOR1_PX -0.066
+param set-default CA_ROTOR1_PY -0.089
+param set-default CA_ROTOR1_KM 0.05
+
+param set-default CA_ROTOR2_PX 0.066
+param set-default CA_ROTOR2_PY -0.088
+param set-default CA_ROTOR2_KM -0.05
+
+param set-default CA_ROTOR3_PX -0.067
+param set-default CA_ROTOR3_PY 0.087
+param set-default CA_ROTOR3_KM -0.05
+
+param set-default SIM_GZ_EC_FUNC1 101
+param set-default SIM_GZ_EC_FUNC2 102
+param set-default SIM_GZ_EC_FUNC3 103
+param set-default SIM_GZ_EC_FUNC4 104
+
+# Rotor speed [rad/s] at zero and full output (PROPULSION in make_model.py)
+param set-default SIM_GZ_EC_MIN1 150
+param set-default SIM_GZ_EC_MIN2 150
+param set-default SIM_GZ_EC_MIN3 150
+param set-default SIM_GZ_EC_MIN4 150
+
+param set-default SIM_GZ_EC_MAX1 1890
+param set-default SIM_GZ_EC_MAX2 1890
+param set-default SIM_GZ_EC_MAX3 1890
+param set-default SIM_GZ_EC_MAX4 1890
+
+# Hover at 0.54 as predicted by the propulsion estimate (checked in the greenhouse, 285 g)
+param set-default MPC_THR_HOVER 0.54
+
+# x500 rate gains with pitch halved: the default pitch loop oscillates at 17.5 Hz (+-110 deg/s, thrust lost in
+# the cycle, the drone barely lifts); stable up to K 0.7, oscillating at 0.85. Roll is calm at the default.
+param set-default MC_PITCHRATE_K 0.5
+param set-default NAV_DLL_ACT 2
+
+# Indoors: no RC, no data link loss action; the flight scripts fly offboard over MAVLink
+param set-default COM_RC_IN_MODE 4
+param set-default NAV_RCL_ACT 0
+param set-default COM_RCL_EXCEPT 4
