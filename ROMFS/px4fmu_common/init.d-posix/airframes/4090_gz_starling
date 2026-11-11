@@ -65,3 +65,14 @@ param set-default NAV_DLL_ACT 2
 param set-default COM_RC_IN_MODE 4
 param set-default NAV_RCL_ACT 0
 param set-default COM_RCL_EXCEPT 4
+
+# Magnetic declination as Gazebo produces it, not from PX4's world magnetic model: gz-sim 8 gives the greenhouse
+# worlds (lat/lon 0/0) a field of 0.32 G, inclination -30 deg, declination +5.0 deg; the model says -3.9 deg there
+# (gz flips the sign). With the lookup PX4 starts 8.9 deg off in heading and drifts back in flight.
+param set-default EKF2_DECL_TYPE 0
+param set-default EKF2_MAG_DECL 5.0
+
+# No smooth take-off ramp: the flight scripts fly the take-off as a min-jerk offboard trajectory. With the default
+# 3 s ramp PX4 starts the climb rate at -2.4 m/s, the vertical velocity integrator winds up against the floor and
+# the drone lifts 2.8 s late and reaches its height 2 s after the setpoint (0.29 m rms height error, 0.05 m without)
+param set-default MPC_TKO_RAMP_T 0
